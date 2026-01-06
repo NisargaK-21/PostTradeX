@@ -1,105 +1,62 @@
-🧠 Backend – Blockchain Settlement APIs
+# Backend – Blockchain Settlement APIs
 
-This backend service acts as a read-only bridge between the Ethereum smart contract and the rest of the system.
-It reads settlement data directly from the blockchain and exposes it through REST APIs for the frontend and analytics layers.
+This backend service provides a read-only interface to the Ethereum smart contract.  
+It reads settlement data directly from the blockchain and exposes it via REST APIs for other system components.
 
-🔒 The backend does not write to the blockchain and does not require a private key.
+The backend does not write to the blockchain and does not require a private key.
 
-🧱 Tech Stack
+---
 
-Node.js (v18+)
+## Tech Stack
 
-Express.js
+- Node.js (v18+)
+- Express.js
+- ethers.js
+- Hardhat
 
-ethers.js
+---
 
-Hardhat (local blockchain for development)
+## Folder Structure
 
-📁 Folder Structure
+```text
 backend/
 ├── src/
-│ ├── abi/
-│ │ └── SettlementTracker.json
-│ ├── routes/
-│ │ └── settlement.js
-│ ├── services/
-│ │ └── blockchainService.js
-│ ├── app.js
-│ └── server.js
+│   ├── abi/
+│   │   └── SettlementTracker.json
+│   ├── routes/
+│   │   └── settlement.js
+│   ├── services/
+│   │   └── blockchainService.js
+│   ├── app.js
+│   └── server.js
 ├── .env.example
 ├── package.json
 └── .gitignore
+```
 
-🔽 Pulling the Backend
-git clone <REPO_URL>
-cd PostTradeX/backend
+## Pulling the Backend
 
-📦 Install Dependencies
-npm install
+     git clone <REPO_URL>
+     cd PostTradeX/backend
 
-🔐 Environment Variables
+## Install Dependencies
 
-Create a .env file inside the backend/ folder.
+     npm install
 
-RPC_URL=http://127.0.0.1:8545
-CONTRACT_ADDRESS=0xYOUR_CONTRACT_ADDRESS
-PORT=5000
+## Environment Variables
 
-Variable Description
-Variable Purpose
-RPC_URL Ethereum RPC endpoint (local Hardhat or testnet)
-CONTRACT_ADDRESS Deployed smart contract address
-PORT Backend server port
+     Create a .env file inside the backend/ folder.
 
-📌 The .env file is not committed.
-Refer to .env.example for required variables.
+       RPC_URL=http://127.0.0.1:8545
+       CONTRACT_ADDRESS=0xYOUR_CONTRACT_ADDRESS
+       PORT=5000
 
-⛓️ Blockchain Requirement (Local Setup)
+## Running the Backend
 
-Before starting the backend, ensure the blockchain is running.
+     node src/server.js
 
-cd blockchain
-npx hardhat node
+## API Endpoints
 
-Deploy the contract:
-
-npx hardhat run scripts/deploy.js --network localhost
-
-Copy the deployed contract address into backend/.env.
-
-▶️ Running the Backend
-cd backend
-node src/server.js
-
-Expected output:
-
-Backend running on http://localhost:5000
-
-🌐 API Endpoints
 Method Endpoint Description
-GET /api/trades Fetch all recorded trades
-GET /api/trade/:id Fetch a trade by ID
-Example
-http://localhost:5000/api/trades
-
-Response:
-
-[]
-
-(Empty response indicates no trades recorded yet.)
-
-🧠 Design Notes
-
-Read-only blockchain access via ethers.js
-
-BigInt values normalized to JSON-safe strings
-
-Defensive handling for missing trades
-
-Clear separation of routes and blockchain logic
-
-✅ Status
-
-✔ Backend complete
-✔ APIs stable
-✔ Ready for frontend and analytics integration
+GET /api/trades Fetch all trades
+GET /api/trade/:id Fetch trade by ID
