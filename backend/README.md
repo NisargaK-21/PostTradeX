@@ -57,6 +57,9 @@ backend/
 
 ## API Endpoints
 
-Method Endpoint Description
-GET /api/trades Fetch all trades
-GET /api/trade/:id Fetch trade by ID
+## API Endpoints
+
+| Method | Endpoint         | Description       |
+| ------ | ---------------- | ----------------- |
+| GET    | `/api/trades`    | Fetch all trades  |
+| GET    | `/api/trade/:id` | Fetch trade by ID |
