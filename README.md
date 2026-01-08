@@ -1,40 +1,330 @@
 <<<<<<< HEAD
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+📈 Transparent Equity Settlement Tracker
 
-## Getting Started
+Blockchain-based Post-Trade Settlement Visibility with AI Analytics
 
-First, run the development server:
+📌 Table of Contents
 
-```bash
+Project Overview
+
+Problem Statement
+
+Solution Summary
+
+Key Features
+
+System Architecture
+
+Tech Stack
+
+Folder Structure
+
+Prerequisites
+
+Installation & Setup
+
+Smart Contract Deployment
+
+Backend Setup
+
+Frontend Setup
+
+AI / Analytics Setup
+
+Running the Full System
+
+Demo Flow
+
+Team Task Division
+
+Ethics, Security & Compliance
+
+License & Attribution
+
+1️⃣ Project Overview
+
+Stock and equity trades execute instantly, but settlement happens later through multiple intermediaries (T+1 / T+2). This delay creates lack of transparency, settlement risk, disputes, and audit complexity.
+
+This project builds a blockchain-based settlement tracking layer that:
+
+Records trades and settlement updates immutably
+
+Provides real-time settlement visibility
+
+Enables audit-ready transaction history
+
+Uses AI to flag abnormal settlement delays
+
+⚠️ This system does not replace exchanges. It enhances post-trade transparency.
+
+2️⃣ Problem Statement
+
+Equity settlement processes are opaque, slow, and fragmented. Investors, brokers, and regulators cannot track ownership transfer and settlement progress in real time. Existing systems rely on siloed databases and intermediaries, increasing risk and reducing trust. A transparent, tamper-proof, and audit-friendly settlement tracking mechanism is missing.
+
+3️⃣ Solution Summary
+
+We propose a read-only settlement transparency platform using:
+
+Blockchain → immutable trade & settlement records
+
+Smart Contracts → settlement state management
+
+Backend APIs → data aggregation
+
+Frontend Dashboards → visibility for stakeholders
+
+AI Analytics → anomaly & delay detection
+
+4️⃣ Key Features
+
+Immutable settlement ledger
+
+Real-time settlement status tracking
+
+Ownership transfer history
+
+Investor dashboard
+
+Regulator audit view
+
+Settlement delay detection (AI-based)
+
+Privacy-preserving (no personal data)
+
+5️⃣ System Architecture
+┌───────────┐
+│  Frontend │  ← React / Next.js
+└─────┬─────┘
+      │ REST APIs
+┌─────▼─────┐
+│  Backend  │  ← Node.js / FastAPI
+└─────┬─────┘
+      │ Web3 / Ethers
+┌─────▼─────┐
+│ Blockchain│  ← Ethereum Testnet
+└─────┬─────┘
+      │ Events
+┌─────▼─────┐
+│ AI Engine │  ← Python Analytics
+└───────────┘
+
+6️⃣ Tech Stack
+Blockchain
+
+Ethereum (Sepolia / Goerli)
+
+Solidity
+
+Hardhat
+
+Ethers.js
+
+Backend
+
+Node.js (or FastAPI)
+
+Express.js
+
+Web3 / Ethers
+
+Frontend
+
+React / Next.js
+
+Tailwind CSS
+
+MetaMask integration
+
+AI / Analytics
+
+Python
+
+Pandas
+
+Scikit-learn (lightweight)
+
+Matplotlib / Charts
+
+7️⃣ Folder Structure
+transparent-settlement-tracker/
+│
+├── blockchain/
+│   ├── contracts/
+│   │   └── SettlementTracker.sol
+│   ├── scripts/
+│   │   └── deploy.js
+│   ├── test/
+│   ├── hardhat.config.js
+│   └── package.json
+│
+├── backend/
+│   ├── src/
+│   │   ├── routes/
+│   │   │   └── settlement.js
+│   │   ├── services/
+│   │   │   └── blockchainService.js
+│   │   ├── app.js
+│   │   └── server.js
+│   ├── .env
+│   └── package.json
+│
+├── frontend/
+│   ├── src/
+│   │   ├── pages/
+│   │   ├── components/
+│   │   └── App.jsx
+│   ├── .env
+│   └── package.json
+│
+├── ai-analytics/
+│   ├── data/
+│   ├── settlement_analysis.py
+│   └── requirements.txt
+│
+├── README.md
+└── LICENSE
+
+8️⃣ Prerequisites
+
+Install the following:
+
+Node.js (v18+)
+
+npm / yarn
+
+Python (3.9+)
+
+MetaMask wallet
+
+Git
+
+Ethereum testnet ETH (faucet)
+
+9️⃣ Installation & Setup
+Clone Repository
+git clone https://github.com/your-username/transparent-settlement-tracker.git
+cd transparent-settlement-tracker
+
+🔗 10️⃣ Smart Contract Setup
+Install dependencies
+cd blockchain
+npm install
+
+Compile contracts
+npx hardhat compile
+
+Deploy to testnet
+npx hardhat run scripts/deploy.js --network sepolia
+
+
+Save:
+
+Contract address
+
+ABI
+
+🧠 11️⃣ Backend Setup
+Install dependencies
+cd backend
+npm install
+
+Create .env
+RPC_URL=https://sepolia.infura.io/v3/YOUR_KEY
+CONTRACT_ADDRESS=0x...
+PRIVATE_KEY=your_wallet_key
+
+Start backend
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+Backend runs at:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+http://localhost:5000
 
-## Learn More
+🎨 12️⃣ Frontend Setup
+Install dependencies
+cd frontend
+npm install
 
-To learn more about Next.js, take a look at the following resources:
+Create .env
+VITE_BACKEND_URL=http://localhost:5000
+VITE_CONTRACT_ADDRESS=0x...
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Start frontend
+npm run dev
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+Frontend runs at:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+http://localhost:5173
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+📊 13️⃣ AI / Analytics Setup
+Install Python dependencies
+cd ai-analytics
+pip install -r requirements.txt
+
+Run analysis
+python settlement_analysis.py
+
+
+Functions:
+
+Detect delayed settlements
+
+Flag abnormal patterns
+
+Generate reports
+
+▶️ 14️⃣ Running the Full System
+
+Deploy smart contracts
+
+Start backend
+
+Start frontend
+
+Run AI analytics
+
+Interact via frontend dashboard
+
+🎥 15️⃣ Demo Flow
+
+Add mock trade (smart contract)
+
+Update settlement status
+
+View real-time updates on UI
+
+Show immutable audit trail
+
+Display AI-flagged delays
+
+👥 16️⃣ Team Task Division
+Member	Responsibility
+1	Smart Contracts & Blockchain
+2	Backend & APIs
+3	Frontend UI
+4	AI & Analytics
+⚖️ 17️⃣ Ethics, Security & Compliance
+
+Testnet only
+
+No real funds
+
+No personal data
+
+Read-only analytics
+
+Research & educational use
+
+📜 18️⃣ License & Attribution
+
+This project is inspired by open-source blockchain implementations released under the MIT License.
+All problem statements, architecture, and features are independently designed for academic and hackathon use.
+
+🏁 Final Note
+
+This project solves a real financial infrastructure problem using practical technology, not hype. It is scalable, ethical, and realistic — exactly what hackathon judges look for.
 =======
 📈 Transparent Equity Settlement Tracker
 Blockchain-based Post-Trade Settlement Transparency System
