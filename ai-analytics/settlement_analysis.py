@@ -5,7 +5,7 @@ from sklearn.ensemble import IsolationForest
 import matplotlib.pyplot as plt
 
 # Load settlement data
-with open("data/settlements.json") as f:
+with open("settlements.json") as f:
     data = json.load(f)
 
 df = pd.DataFrame(data)
