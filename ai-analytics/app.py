@@ -5,24 +5,47 @@ import pandas as pd
 import numpy as np
 from sklearn.ensemble import IsolationForest
 import os
+import time
 
 app = Flask(__name__)
 CORS(app)
+
+@app.after_request
+def add_header(response):
+    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '-1'
+    return response
 
 DATA_FILE = "settlements.json"
 
 def load_data():
     if not os.path.exists(DATA_FILE):
+        print("settlements.json missing. Regenerating data...")
+        try:
+            from generate_settlement_data import generate_data
+            generate_data()
+        except Exception as e:
+            print(f"Failed to regenerate data: {e}")
+            return []
+            
+    try:
+        with open(DATA_FILE, 'r') as f:
+            return json.load(f)
+    except json.JSONDecodeError as e:
+        print(f"Error reading settlements.json: {e}")
+        return [] # Return empty list instead of crashing
+    except Exception as e:
+        print(f"Unexpected error reading data: {e}")
         return []
-    with open(DATA_FILE, 'r') as f:
-        return json.load(f)
+
 
 @app.route('/trades', methods=['GET'])
 def get_trades():
     raw_data = load_data()
     trades = []
     
-    # We need a DataFrame to run ML, even if simple
+    # We need a DataFrame to run ML
     df_data = []
 
     for item in raw_data:
@@ -30,71 +53,71 @@ def get_trades():
         status_val = str(item['status'])
         timestamp = int(item['timestamp'])
         
-        # Simulate settlement logic
+        # Read directly from JSON - NO HARDCODED SIMULATION
+        settled_at = item.get('settledAt')
+        
         status = "SETTLED" if status_val == "1" else "PENDING"
         
-        # Simulate settlement time
-        # Trade 1005, 1013, 1018 are PENDING in JSON, so no settlement time
-        # Let's make 1003 and 1016 "Delayed" (> 2 days = 172800s)
         if status == "SETTLED":
-            if t_id in [1003, 1016]:
-                settlement_time = 200000 + np.random.randint(0, 5000) # Huge delay
+            if settled_at:
+                settlement_time = int(settled_at) - timestamp
             else:
-                settlement_time = np.random.randint(30, 3000) # Normal delay
-            
-            settled_at = timestamp + settlement_time
+                # Fallback if JSON is malformed
+                settlement_time = 0
+                settled_at = timestamp
         else:
-            settlement_time = 0
-            settled_at = 0
+            # Pending: Calculate elapsed time
+            current_time = int(time.time())
+            settlement_time = current_time - timestamp
+            settled_at = None
 
         trade_obj = {
             "tradeId": t_id,
             "status": status,
             "createdAt": timestamp,
-            "settledAt": settled_at if status == "SETTLED" else None,
-            "settlementTime": settlement_time if status == "SETTLED" else 0
+            "settledAt": settled_at,
+            "settlementTime": settlement_time
         }
         trades.append(trade_obj)
         
-        if status == "SETTLED":
+        if status == "SETTLED" and settlement_time > 0:
             df_data.append({"tradeId": t_id, "settlementTime": settlement_time})
 
     # ML Logic: Detect Anomalies in Settlement Time
     if len(df_data) > 0:
         df = pd.DataFrame(df_data)
-        # Reshape for sklearn
         X = df[["settlementTime"]].values
         
-        # Contamination matches expected outlier rate
+        # Use Isolation Forest to detect anomalies
+        # contamination='auto' lets the model decide, or we can stick to a fixed ratio if preferred
         clf = IsolationForest(contamination=0.1, random_state=42)
         df["anomaly"] = clf.fit_predict(X)
         
-        # Map anomaly back to trades
-        # anomaly = -1 means outlier. 
-        # We don't strictly need to pass this to frontend as frontend has its own logic (> 172800),
-        # but let's log it or ensure our simulated data trips the frontend logic.
-        # The frontend logic for "Delayed" is settlementTime > 172800.
-        # My simulated data for 1003 and 1016 is > 200000, so it will accurately reflect.
+        # Map anomalies back to trades
+        # -1 indicates anomaly, 1 indicates normal
+        anomaly_map = dict(zip(df["tradeId"], df["anomaly"]))
         
-        pass
+        for trade in trades:
+            t_id = trade["tradeId"]
+            if t_id in anomaly_map:
+                # -1 from IsolationForest means anomaly/outlier
+                is_anomaly = True if anomaly_map[t_id] == -1 else False
+                trade["isAnomaly"] = is_anomaly
+                trade["aiFlagged"] = is_anomaly # explicit field for UI
+            else:
+                trade["isAnomaly"] = False
+                trade["aiFlagged"] = False
 
     return jsonify(trades)
 
-# Analytics endpoint (some frontend versions might call this, though page.js seemed to call /trades or /settlements)
 @app.route('/settlements', methods=['GET'])
 def get_settlements():
-    # Reuse /trades logic as the data structure is likely what's expected or very similar
-    # The frontend code for AnalyticsPage (`app/analytics/page.js`) calls `/trades` in the updated version I saw (lines 222).
-    # But the commented out version called `/settlements`. Just in case, I'll alias it.
     return get_trades()
 
 @app.route('/audit', methods=['GET'])
 def get_audit():
-    # Reuse /trades logic, but maybe format it if needed?
-    # AuditPage (`app/audit/page.js`) calls `/trades` in the active version (line 52).
-    # It expects list of trades and maps them locally.
     return get_trades()
 
 if __name__ == '__main__':
-    print("Starting Flask AI Analytics Server...")
+    print("Starting Flask AI Analytics Server (Dynamic Mode)...")
     app.run(host='0.0.0.0', port=5000, debug=True)
